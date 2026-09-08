@@ -1,0 +1,104 @@
+:root {
+    --navy: #2c3e50; --accent: #4a9fd4; --sky: #bbd9f1;
+    --white: #ffffff; --danger: #ff4757; --green: #2ecc71;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body { 
+    font-family: 'DM Sans', sans-serif; 
+    background: #e2e8f0; 
+    display: flex; justify-content: center; align-items: center;
+    min-height: 100vh; padding: 40px;
+}
+
+/* CARD PRINCIPAL - Más ancha para PC */
+.p-card {
+    background: var(--white);
+    width: 100%;
+    max-width: 850px; /* Ancho ajustado para PC */
+    border-radius: 30px;
+    overflow: hidden;
+    box-shadow: 0 40px 80px -15px rgba(0,0,0,0.15);
+}
+
+.nav-back {
+    position: absolute; top: 20px; left: 20px; z-index: 10;
+    color: white; text-decoration: none; background: rgba(0,0,0,0.2);
+    padding: 10px 20px; border-radius: 12px; font-weight: 700; transition: 0.3s;
+}
+
+.p-banner {
+    height: 180px;
+    background: linear-gradient(45deg, var(--navy), var(--accent));
+    display: flex; justify-content: flex-end; padding: 25px;
+}
+
+.tag-live {
+    background: var(--green); color: white; font-size: 11px;
+    font-weight: 800; padding: 6px 14px; border-radius: 20px; height: fit-content;
+}
+
+.p-header {
+    padding: 0 50px 30px; margin-top: -80px;
+    display: flex; flex-direction: column; align-items: center; text-align: center;
+}
+
+.p-img-wrap { position: relative; margin-bottom: 20px; }
+.p-avatar {
+    width: 160px; height: 160px; border-radius: 50%;
+    border: 8px solid var(--white); box-shadow: 0 15px 35px rgba(0,0,0,0.1); object-fit: cover;
+}
+
+.p-avatar-empty {
+    background: #f8fafc;
+    border-color: var(--white);
+}
+
+.p-badge {
+    position: absolute; bottom: 15px; right: 5px;
+    background: var(--white); color: var(--accent);
+    width: 35px; height: 35px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1); font-size: 18px;
+}
+
+.p-info h2 { font-family: 'Syne'; font-size: 2.5rem; color: var(--navy); }
+.p-job { color: var(--accent); font-weight: 700; font-size: 1.1rem; }
+.p-desc { color: #475569; max-width: 560px; margin: 10px auto; line-height: 1.5; }
+.p-loc { font-size: 0.9rem; color: #64748b; margin-top: 5px; }
+
+.p-stats {
+    display: flex; gap: 60px; margin: 30px 0;
+    background: #f8fafc; padding: 20px 50px; border-radius: 24px;
+}
+
+.s-item b { display: block; font-size: 1.5rem; color: var(--navy); }
+.s-item span { font-size: 0.8rem; color: #94a3b8; text-transform: uppercase; font-weight: 700; }
+
+.p-btns { display: flex; gap: 15px; width: 100%; max-width: 400px; }
+.btn-edit {
+    flex: 1; background: var(--navy); color: white; border: none;
+    padding: 15px; border-radius: 18px; font-weight: 700; cursor: pointer; transition: 0.3s;
+}
+.btn-edit:hover { background: #1a252f; transform: translateY(-2px); }
+
+.btn-out {
+    width: 60px; background: #fee2e2; color: var(--danger); border: none;
+    border-radius: 18px; cursor: pointer; transition: 0.3s; font-size: 1.2rem;
+}
+
+.p-body { padding: 40px 50px; display: grid; grid-template-columns: 1fr 1fr; gap: 40px; text-align: left; }
+.b-sec h3 { font-family: 'Syne'; font-size: 1rem; color: var(--navy); margin-bottom: 15px; }
+.b-sec p { color: #475569; line-height: 1.7; font-size: 0.95rem; }
+
+.tag-wrap { display: flex; gap: 10px; flex-wrap: wrap; }
+.tag { background: var(--sky); color: var(--navy); padding: 8px 16px; border-radius: 12px; font-weight: 700; font-size: 0.85rem; }
+
+.p-feed { padding: 40px 50px; background: #f1f5f9; text-align: left; }
+.p-feed small { color: #94a3b8; letter-spacing: 2px; font-weight: 800; display: block; margin-bottom: 20px; }
+
+.f-item { display: flex; gap: 20px; background: white; padding: 20px; border-radius: 20px; }
+.mini-p { width: 45px; height: 45px; background: var(--accent); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 800; }
+.f-msg strong { display: flex; justify-content: space-between; font-size: 0.9rem; margin-bottom: 5px; }
+.stars { color: #f1c40f; }

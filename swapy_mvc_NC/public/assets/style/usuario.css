@@ -1,0 +1,116 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Segoe UI', sans-serif;
+}
+
+body {
+    background-color: #ffffff;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+/* --- Barra Superior --- */
+.top-nav {
+    height: 60px;
+    border-bottom: 1px solid #e5e5e5;
+    display: flex;
+    align-items: center;
+    padding: 0 20px;
+}
+
+.logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-weight: bold;
+    color: #0084ff;
+    font-size: 1.2rem;
+}
+
+/* --- Layout Principal --- */
+.main-layout {
+    display: flex;
+    flex: 1; /* Ocupa el resto de la pantalla */
+    overflow: hidden;
+}
+
+/* --- Sidebar Izquierda --- */
+.sidebar-left {
+    width: 25%;
+    border-right: 1px solid #e5e5e5;
+}
+
+/* --- Ventana Chat --- */
+.chat-window {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.message-content {
+    flex: 1;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.message {
+    padding: 10px 15px;
+    border-radius: 18px;
+    max-width: 70%;
+}
+
+.sent { align-self: flex-end; background: #0084ff; color: white; }
+.received { align-self: flex-start; background: #e4e6eb; }
+
+/* --- Sidebar Derecha (Nuevo) --- */
+.sidebar-right {
+    width: 25%;
+    border-left: 1px solid #e5e5e5;
+    padding: 20px;
+    text-align: center;
+}
+
+.avatar-large {
+    width: 80px;
+    height: 80px;
+    background: #0084ff;
+    border-radius: 50%;
+    margin: 0 auto 15px;
+}
+
+.user-profile-detail h4 { margin-bottom: 5px; }
+.user-profile-detail p { font-size: 0.8rem; color: gray; margin-bottom: 20px; }
+
+.options-list {
+    text-align: left;
+    margin-top: 30px;
+}
+
+.option-item {
+    padding: 10px;
+    font-weight: 500;
+    cursor: pointer;
+    border-radius: 8px;
+}
+
+.option-item:hover { background: #f0f2f5; }
+
+/* --- Input --- */
+.chat-input {
+    padding: 15px;
+    display: flex;
+    gap: 10px;
+}
+
+.chat-input input {
+    flex: 1;
+    padding: 10px;
+    border-radius: 20px;
+    border: none;
+    background: #f0f2f5;
+}
