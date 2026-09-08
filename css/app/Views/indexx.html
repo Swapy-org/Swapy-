@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Swapy - Trueque Realizado</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+    }
+
+    body {
+      position: relative;
+      width: 100vw;
+      height: 100vh;
+      overflow: hidden;
+      background: #050811 url('../assets/IMG/SWAPY.png') center / cover no-repeat;
+      display: flex;
+    }
+
+    .bg-video {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      z-index: 1;
+    }
+
+    .overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, rgba(0,0,0,0.1) 0%, rgba(5, 8, 17, 0.6) 60%, rgba(5, 8, 17, 0.85) 100%);
+      z-index: 2;
+    }
+
+    .left-space {
+      width: 50%;
+      height: 100%;
+      z-index: 3;
+    }
+
+    .right-container {
+      width: 50%;
+      height: 100%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 40px;
+      z-index: 3;
+      position: relative;
+    }
+
+    /* Contenedores de las tarjetas */
+    .card-panel {
+      position: absolute;
+      width: 100%;
+      max-width: 440px;
+      background: rgba(13, 20, 36, 0.75);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 24px;
+      padding: 40px 32px;
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5), 0 0 30px rgba(45, 108, 223, 0.15);
+      color: #ffffff;
+      transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+      opacity: 0;
+      visibility: hidden;
+      transform: translateY(20px);
+      pointer-events: none;
+    }
+
+    .card-panel.active {
+      opacity: 1;
+      visibility: visible;
+      transform: translateY(0);
+      pointer-events: auto;
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 6px 16px;
+      background: rgba(45, 108, 223, 0.2);
+      border: 1px solid rgba(88, 166, 255, 0.4);
+      border-radius: 20px;
+      color: #ff8800;
+      font-size: 0.8rem;
+      font-weight: 700;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      margin-bottom: 16px;
+    }
+
+    .card-panel h1, .card-panel h3 {
+      font-size: 1.8rem;
+      font-weight: 800;
+      margin-bottom: 12px;
+      background: linear-gradient(135deg, #ffffff 0%, #a5c0ee 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      text-align: center;
+    }
+
+    .card-panel p {
+      font-size: 0.95rem;
+      color: #d4d3d3;
+      line-height: 1.5;
+      margin-bottom: 24px;
+      text-align: center;
+    }
+
+    .actions {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .btn {
+      width: 100%;
+      padding: 14px;
+      border: none;
+      border-radius: 14px;
+      font-size: 1rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .btn-accept, .btn-primario {
+      background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+      color: #ffffff;
+      box-shadow: 0 8px 20px rgba(37, 99, 235, 0.35);
+    }
+
+    .btn-accept:hover, .btn-primario:hover {
+      background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+      transform: translateY(-2px);
+      box-shadow: 0 12px 25px rgba(37, 99, 235, 0.5);
+    }
+
+    .btn-cancel, .btn-secundario {
+      background: rgba(255, 255, 255, 0.05);
+      color: #cbd5e1;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .btn-cancel:hover, .btn-secundario:hover {
+      background: rgba(255, 255, 255, 0.1);
+    }
+
+    /* Estilos específicos del formulario */
+    .form-group {
+      margin-bottom: 16px;
+      display: flex;
+      flex-direction: column;
+      text-align: left;
+    }
+
+    .form-group label {
+      margin-bottom: 6px;
+      font-weight: 600;
+      font-size: 0.85rem;
+      color: #a5c0ee;
+    }
+
+    .form-group input, 
+    .form-group textarea {
+      width: 100%;
+      padding: 12px;
+      background: rgba(5, 8, 17, 0.5);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      border-radius: 10px;
+      font-size: 0.95rem;
+      color: #ffffff;
+      font-family: inherit;
+      resize: none;
+      outline: none;
+      transition: border-color 0.3s;
+    }
+
+    .form-group input:focus, 
+    .form-group textarea:focus {
+      border-color: #3b82f6;
+    }
+
+    .form-footer {
+      display: flex;
+      gap: 10px;
+      margin-top: 10px;
+    }
+
+    .waiting-panel {
+      text-align: center;
+    }
+
+    .waiting-panel h3 {
+      color: #ffffff;
+      margin-bottom: 12px;
+      font-size: 1.45rem;
+    }
+
+    .waiting-panel p {
+      margin-bottom: 24px;
+      color: #d4d3d3;
+    }
+
+    .loader {
+      width: 54px;
+      height: 54px;
+      margin: 0 auto 22px;
+      border: 5px solid rgba(255, 255, 255, 0.18);
+      border-top-color: #3b82f6;
+      border-radius: 50%;
+      animation: spin 0.9s linear infinite;
+    }
+
+    .countdown {
+      color: #8fb8ff;
+      font-weight: 700;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    .envio {
+      color: #b4b4b4;
+    }
+
+    @media (max-width: 868px) {
+      body { flex-direction: column; }
+      .left-space { display: none; }
+      .right-container { width: 100%; height: 100%; padding: 20px; }
+    }
+  </style>
+</head>
+<body>
+
+  <video class="bg-video" autoplay loop muted playsinline preload="auto">
+    <source src="assets/IMG/nave.mp4" type="video/mp4">
+  </video>
+
+  <div class="overlay"></div>
+  <div class="left-space"></div>
+
+  <div class="right-container">
+    
+    <!-- PANTALLA DEL TERCIARIO SWAPY -->
+    <div id="card-solicitud" class="card-panel active">
+      <span class="badge">Terciario Swapy</span>
+      <h1>Solicitar un terciario Swapy</h1>
+      <p>Un empleado gestionará la entrega de este intercambio de forma segura.</p>
+      
+      <div class="actions">
+        <p class="envio">Déjanos facilitar el envío de tu trueque y que también te llegue tu intercambio de forma segura</p>
+        <button type="button" class="btn btn-accept" onclick="aceptarTerciario()">
+          Aceptar solicitud
+        </button>
+        <button type="button" class="btn btn-cancel" onclick="window.parent.closeModal('modal-indexx')">
+          Cancelar
+        </button>
+      </div>
+    </div>
+
+    <!-- CARGA DE 3 SEGUNDOS -->
+    <div id="card-carga-terciario" class="card-panel waiting-panel">
+      <div class="loader" aria-hidden="true"></div>
+      <h3>Preparando solicitud</h3>
+      <p>Cargando el formulario de envío.</p>
+    </div>
+
+    <!-- FORMULARIO DE DATOS -->
+    <div id="card-formulario" class="card-panel">
+      <h3>Datos del intercambio</h3>
+      <p style="margin-bottom: 20px;">Completa la información para coordinar tu envío</p>
+      
+      <form id="form-datos-intercambio" onsubmit="guardarDatosIntercambio(event)">
+        <div class="form-group">
+          <label for="direccion">Dirección</label>
+          <input type="text" id="direccion" required placeholder="Calle, carrera y número">
+        </div>
+        <div class="form-group">
+          <label for="descripcion_lugar">Descripción del lugar</label>
+          <textarea id="descripcion_lugar" rows="2" required placeholder="Punto de referencia o indicaciones"></textarea>
+        </div>
+        <div class="form-group">
+          <label for="descripcion_producto">Descripción del producto</label>
+          <textarea id="descripcion_producto" rows="2" required placeholder="Estado y características del producto"></textarea>
+        </div>
+        
+        <div class="form-footer">
+          <button type="button" class="btn btn-secundario" onclick="mostrarSolicitud()">Volver</button>
+          <button type="submit" class="btn btn-primario">Guardar datos</button>
+        </div>
+      </form>
+    </div>
+
+    <!-- CONFIRMACIÓN DE ENVÍO -->
+    <div id="card-enviado" class="card-panel waiting-panel">
+      <div class="loader" aria-hidden="true" id="enviado-loader"></div>
+      <h3 id="enviado-titulo">Enviando solicitud...</h3>
+      <p id="enviado-texto">Un momento por favor.</p>
+    </div>
+
+  </div>
+
+  <script>
+    function aceptarTerciario() {
+      document.getElementById('card-solicitud').classList.remove('active');
+      document.getElementById('card-carga-terciario').classList.add('active');
+
+      window.setTimeout(function() {
+        document.getElementById('card-carga-terciario').classList.remove('active');
+        document.getElementById('card-formulario').classList.add('active');
+      }, 3000);
+    }
+
+    function mostrarSolicitud() {
+      document.getElementById('card-formulario').classList.remove('active');
+      document.getElementById('card-solicitud').classList.add('active');
+    }
+
+    function guardarDatosIntercambio(event) {
+      event.preventDefault();
+
+      var datos = {
+        direccion: document.getElementById('direccion').value.trim(),
+        descripcion_lugar: document.getElementById('descripcion_lugar').value.trim(),
+        descripcion_producto: document.getElementById('descripcion_producto').value.trim()
+      };
+
+      document.getElementById('card-formulario').classList.remove('active');
+      document.getElementById('card-enviado').classList.add('active');
+
+      if (window.parent && window.parent !== window) {
+        window.parent.postMessage({ tipo: 'solicitud_entrega', datos: datos }, '*');
+        return;
+      }
+
+      alert('✅ Datos del intercambio registrados correctamente.');
+    }
+
+    window.addEventListener('message', function(event) {
+      if (event.data === 'solicitud_entrega_ok') {
+        document.getElementById('enviado-loader').style.display = 'none';
+        document.getElementById('enviado-titulo').textContent = '✅ Solicitud enviada';
+        document.getElementById('enviado-texto').textContent = 'Un empleado la revisará pronto.';
+      }
+
+      if (event.data === 'solicitud_entrega_error') {
+        document.getElementById('enviado-loader').style.display = 'none';
+        document.getElementById('enviado-titulo').textContent = '⚠️ No se pudo enviar';
+        document.getElementById('enviado-texto').textContent = 'Intenta de nuevo más tarde.';
+      }
+    });
+  </script>
+</body>
+</html>
