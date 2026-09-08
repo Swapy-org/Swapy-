@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Swapy | Panel Empleado</title>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=Syne:wght@700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" th:href="@{/assets/style/empleado_panel.css}">
+</head>
+<body>
+
+<aside class="sidebar" id="sidebar">
+    <div class="sidebar-brand">
+        <div class="brand-logo">Swapy<span>.</span></div>
+        <div class="brand-sub">Panel Empleado</div>
+    </div>
+    <nav class="sidebar-nav">
+        <div class="nav-label">Principal</div>
+        <a href="javascript:void(0);" class="nav-item active" onclick="go('inicio')" id="nav-inicio"><span class="nav-icon">🏠</span> Inicio</a>
+
+        <div class="nav-label">Gestión</div>
+        <a href="javascript:void(0);" class="nav-item" onclick="go('intercambios')" id="nav-intercambios">
+            <span class="nav-icon">🔄</span> Reporte Intercambios
+            <span class="nav-badge" th:text="${#lists.size(intercambios)}">0</span>
+        </a>
+        <a href="javascript:void(0);" class="nav-item" onclick="go('solicitudes')" id="nav-solicitudes">
+            <span class="nav-icon">🚚</span> Solicitudes de Entrega
+            <span class="nav-badge" th:text="${#lists.size(solicitudesPendientes)}">0</span>
+        </a>
+        <a href="javascript:void(0);" class="nav-item" onclick="go('entregas')" id="nav-entregas">
+            <span class="nav-icon">📦</span> Mis Entregas
+            <span class="nav-badge" th:text="${stats.entregasPendientesHoy}">0</span>
+        </a>
+        <a href="javascript:void(0);" class="nav-item" onclick="go('denuncias')" id="nav-denuncias">
+            <span class="nav-icon">🚩</span> Denuncias
+            <span class="nav-badge" th:text="${stats.denunciasActivas}">0</span>
+        </a>
+        <a href="javascript:void(0);" class="nav-item" onclick="go('empleados')" id="nav-empleados">
+            <span class="nav-icon">🧑‍💼</span> Empleados
+            <span class="nav-badge" th:text="${#lists.size(empleados)}">0</span>
+        </a>
+
+        <div class="nav-label">Soporte</div>
+        <a href="javascript:void(0);" class="nav-item" onclick="go('errores')" id="nav-errores"><span class="nav-icon">⚠️</span> Errores Frecuentes</a>
+
+        <div class="nav-label">Mi cuenta</div>
+        <a href="javascript:void(0);" class="nav-item" onclick="go('perfil')" id="nav-perfil"><span class="nav-icon">👤</span> Mi Perfil</a>
+    </nav>
+    <div class="sidebar-footer">
+        <a th:href="@{/empleado/logout}" class="btn-logout" style="width:100%; display:block; text-align:center; text-decoration:none;">
+            🚪 Cerrar sesión
+        </a>
+    </div>
+</aside>
+
+<header class="topbar">
+    <div style="display:flex;align-items:center;gap:14px;">
+        <button class="hamburger" onclick="toggleSidebar()">☰</button>
+        <div class="topbar-title" id="topbar-title">Inicio <span>/ Dashboard</span></div>
+    </div>
+    <div class="topbar-right">
+        <div class="topbar-notif" title="Notificaciones">🔔<span class="notif-dot"></span></div>
+        <div class="user-chip">
+            <div class="user-avatar" th:text="${#strings.substring(empleado.persona.primerNombre,0,1)} + ${#strings.substring(empleado.persona.primerApellido,0,1)}">JD</div>
+            <div>
+                <div class="user-name" th:text="${empleado.persona.nombreCompleto}">Juan David</div>
+                <div class="user-role">Empleado</div>
+            </div>
+        </div>
+    </div>
+</header>
+
+<main class="main">
+
+    <!-- ===================== INICIO ===================== -->
+    <section class="section active" id="sec-inicio">
+        <div class="section-head">
+            <div class="eyebrow">✦ Bienvenido de vuelta</div>
+            <h1>Hola, <em th:text="${empleado.persona.primerNombre}">Juan David</em> 👋</h1>
+        </div>
+        <div class="stats-row">
+            <div class="stat-card c-orange">
+                <div class="stat-icon">🔄</div>
+                <div class="stat-label">Intercambios este mes</div>
+                <div class="stat-value" th:text="${stats.intercambiosCreadosEsteMes}">0</div>
+                <div class="stat-trend">Cerrados / en curso</div>
+            </div>
+            <div class="stat-card c-green">
+                <div class="stat-icon">✅</div>
+                <div class="stat-label">Entregas completadas</div>
+                <div class="stat-value" th:text="${stats.intercambiosEntregados}">0</div>
+                <div class="stat-trend">Histórico</div>
+            </div>
+            <div class="stat-card c-red">
+                <div class="stat-icon">🚩</div>
+                <div class="stat-label">Denuncias activas</div>
+                <div class="stat-value" th:text="${stats.denunciasActivas}">0</div>
+                <div class="stat-trend">Requieren atención</div>
+            </div>
+            <div class="stat-card c-blue">
+                <div class="stat-icon">🚚</div>
+                <div class="stat-label">Mis entregas pendientes</div>
+                <div class="stat-value" th:text="${stats.entregasPendientesHoy}">0</div>
+                <div class="stat-trend">Aceptadas / en ruta</div>
+            </div>
+        </div>
+        <div class="dash-grid">
+            <div class="card">
+                <div class="card-header"><span class="card-title">Actividad reciente</span></div>
+                <div class="activity-list">
+                    <div class="activity-item" th:each="e : ${misEntregas}" th:if="${eStat.index < 4}">
+                        <div class="act-dot"
+                             th:classappend="${e.estado.name() == 'Entregada'} ? 'green' : (${e.estado.name() == 'En_ruta'} ? 'blue' : 'orange')"></div>
+                        <div>
+                            <div class="act-text">
+                                Entrega <span th:text="'#' + ${e.idEntrega}"></span> —
+                                <span th:text="${e.estado}"></span>
+                            </div>
+                            <div class="act-time" th:text="${e.direccionEntrega}"></div>
+                        </div>
+                    </div>
+                    <div class="activity-item" th:each="d : ${denuncias}" th:if="${dStat.index < 2}">
+                        <div class="act-dot red"></div>
+                        <div>
+                            <div class="act-text">Denuncia <span th:text="'#' + ${d.idDenuncia}"></span> — <span th:text="${d.tipoDenuncia}"></span></div>
+                            <div class="act-time" th:text="${d.estado}"></div>
+                        </div>
+                    </div>
+                    <div class="activity-item" th:if="${#lists.isEmpty(misEntregas) and #lists.isEmpty(denuncias)}">
+                        <div class="act-text">Sin actividad reciente todavía.</div>
+                    </div>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-header"><span class="card-title">Resumen</span></div>
+                <div class="progress-wrap">
+                    <div>
+                        <div class="progress-item-label"><span>Intercambios entregados</span><span th:text="${stats.intercambiosEntregados}">0</span></div>
+                        <div class="progress-bar"><div class="progress-fill fill-green" style="width:70%"></div></div>
+                    </div>
+                    <div>
+                        <div class="progress-item-label"><span>Intercambios en proceso</span><span th:text="${stats.intercambiosEnProceso}">0</span></div>
+                        <div class="progress-bar"><div class="progress-fill fill-orange" style="width:60%"></div></div>
+                    </div>
+                    <div>
+                        <div class="progress-item-label"><span>Denuncias resueltas</span><span th:text="${stats.denunciasResueltas}">0</span></div>
+                        <div class="progress-bar"><div class="progress-fill fill-blue" style="width:50%"></div></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===================== INTERCAMBIOS ===================== -->
+    <section class="section" id="sec-intercambios">
+        <div class="section-head">
+            <div class="eyebrow">✦ Gestión</div>
+            <h1>Reporte de <em>Intercambios</em></h1>
+        </div>
+        <div class="card">
+            <div class="card-header">
+                <span class="card-title">Historial de intercambios</span>
+                <div class="search-box"><span>🔍</span><input type="text" placeholder="Buscar intercambio..." oninput="filtrarTabla(this,'tbl-inter')"></div>
+            </div>
+            <table id="tbl-inter">
+                <thead>
+                <tr><th>#</th><th>Dirección</th><th>Productos</th><th>Fecha cierre</th><th>Estado</th></tr>
+                </thead>
+                <tbody>
+                <tr th:each="i : ${intercambios}">
+                    <td th:text="'#' + ${i.idIntercambio}"></td>
+                    <td th:text="${i.direccion} ?: '—'"></td>
+                    <td th:text="${i.nProductoPublicado} + ' / ' + ${i.nProductoOfertado}"></td>
+                    <td th:text="${i.fechaCierre} ?: '—'"></td>
+                    <td>
+                        <span class="badge badge-entregado" th:if="${i.estado == 'Entregado'}">✓ Entregado</span>
+                        <span class="badge badge-cancelado" th:if="${i.estado == 'Cancelado'}">✗ Cancelado</span>
+                        <span class="badge badge-proceso" th:if="${i.estado == 'En proceso'}">↻ En proceso</span>
+                    </td>
+                </tr>
+                <tr th:if="${#lists.isEmpty(intercambios)}"><td colspan="5">No hay intercambios registrados.</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+    <!-- ===================== SOLICITUDES DE ENTREGA (CRUD completo) ===================== -->
+    <section class="section" id="sec-solicitudes">
+        <div class="section-head">
+            <div class="eyebrow">✦ Logística</div>
+            <h1>Solicitudes de <em>Entrega</em></h1>
+        </div>
+        <div class="card" style="margin-bottom:20px;">
+            <div class="card-header">
+                <span class="card-title">Todas las solicitudes</span>
+                <button class="btn-primary" onclick="abrirNuevaEntrega()">+ Nueva solicitud</button>
+            </div>
+            <table id="tbl-sol">
+                <thead>
+                <tr><th>#</th><th>Solicitante</th><th>Dirección Recogida</th><th>Dirección Entrega</th><th>Hora límite</th><th>Estado</th><th>Acciones</th></tr>
+                </thead>
+                <tbody>
+                <tr th:each="s : ${todasLasEntregas}" th:attr="data-id=${s.idEntrega}">
+                    <td th:text="'S-' + ${s.idEntrega}"></td>
+                    <td th:text="${s.solicitante} ?: 'N/A'"></td>
+                    <td th:text="${s.direccionRecogida}"></td>
+                    <td th:text="${s.direccionEntrega}"></td>
+                    <td th:text="${s.horaLimite} ?: '—'"></td>
+                    <td>
+                        <span class="badge badge-pendiente" th:if="${s.estado.name() == 'Pendiente'}">⏳ Pendiente</span>
+                        <span class="badge badge-proceso" th:if="${s.estado.name() == 'Aceptada'}">↻ Aceptada</span>
+                        <span class="badge badge-proceso" th:if="${s.estado.name() == 'En_ruta'}">🚚 En ruta</span>
+                        <span class="badge badge-entregado" th:if="${s.estado.name() == 'Entregada'}">✓ Entregada</span>
+                        <span class="badge badge-cancelado" th:if="${s.estado.name() == 'Fallida'}">✗ Fallida</span>
+                        <span class="badge badge-cancelado" th:if="${s.estado.name() == 'Cancelada'}">✗ Cancelada</span>
+                    </td>
+                    <td class="actions">
+                        <button class="btn-sm" title="Aceptar" th:if="${s.estado.name() == 'Pendiente'}" th:onclick="'aceptarSolicitud(' + ${s.idEntrega} + ')'">✅</button>
+                        <button class="btn-sm editar-entrega" title="Editar" th:if="${s.estado.name() == 'Pendiente'}"
+                                th:attr="data-id=${s.idEntrega}"
+                                th:data-intercambio="${s.intercambio.idIntercambio}"
+                                th:data-solicitante="${s.solicitante}"
+                                th:data-recogida="${s.direccionRecogida}"
+                                th:data-entrega="${s.direccionEntrega}"
+                                th:data-hora="${s.horaLimite}">✏️</button>
+                        <button class="btn-sm danger" title="Eliminar" th:if="${s.estado.name() == 'Pendiente' or s.estado.name() == 'Cancelada'}" th:onclick="'eliminarSolicitud(' + ${s.idEntrega} + ')'">🗑️</button>
+                    </td>
+                </tr>
+                <tr th:if="${#lists.isEmpty(todasLasEntregas)}"><td colspan="7">No hay solicitudes de entrega registradas.</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+
+    <!-- ===================== MIS ENTREGAS (panel nuevo) ===================== -->
+    <section class="section" id="sec-entregas">
+        <div class="section-head">
+            <div class="eyebrow">✦ Logística</div>
+            <h1>Mis <em>Entregas</em></h1>
+        </div>
+
+        <div th:each="e : ${misEntregas}" class="entrega-card" th:attr="data-id=${e.idEntrega}">
+            <div class="entrega-top">
+                <div>
+                    <div class="entrega-id" th:text="'Entrega #' + ${e.idEntrega}"></div>
+                    <div class="entrega-ruta">
+                        <b>Recoger:</b> <span th:text="${e.direccionRecogida}"></span> &nbsp;→&nbsp;
+                        <b>Entregar:</b> <span th:text="${e.direccionEntrega}"></span>
+                    </div>
+                    <div class="entrega-ruta" th:if="${e.horaLimite}">Hora límite: <span th:text="${e.horaLimite}"></span></div>
+                </div>
+                <span class="badge badge-proceso" th:if="${e.estado.name() == 'Aceptada'}">↻ Aceptada</span>
+                <span class="badge badge-proceso" th:if="${e.estado.name() == 'En_ruta'}">🚚 En ruta</span>
+                <span class="badge badge-entregado" th:if="${e.estado.name() == 'Entregada'}">✓ Entregada</span>
+                <span class="badge badge-cancelado" th:if="${e.estado.name() == 'Fallida'}">✗ Fallida</span>
+                <span class="badge badge-cancelado" th:if="${e.estado.name() == 'Cancelada'}">✗ Cancelada</span>
+            </div>
+
+            <div class="entrega-steps">
+                <div class="step" th:classappend="${e.estado.name() != 'Aceptada'} ? 'done'"></div>
+                <div class="step" th:classappend="${e.estado.name() == 'En_ruta' or e.estado.name() == 'Entregada'} ? 'done'"></div>
+                <div class="step" th:classappend="${e.estado.name() == 'Entregada'} ? 'done'"></div>
+            </div>
+
+            <div class="entrega-actions">
+                <button class="btn-primary" th:if="${e.estado.name() == 'Aceptada'}" th:onclick="'marcarEnRuta(' + ${e.idEntrega} + ')'">🚚 Marcar recogido / en camino</button>
+                <button class="btn-primary" th:if="${e.estado.name() == 'En_ruta'}" th:onclick="'marcarEntregada(' + ${e.idEntrega} + ')'">✅ Confirmar entrega</button>
+                <button class="btn-outline" th:if="${e.estado.name() == 'En_ruta'}" th:onclick="'intentoFallido(' + ${e.idEntrega} + ')'">⏱️ Cliente no está (reagendar)</button>
+            </div>
+        </div>
+
+        <div class="card" th:if="${#lists.isEmpty(misEntregas)}">
+            <div style="padding:30px;text-align:center;color:var(--muted);">
+                Aún no tienes entregas asignadas. Ve a <b>Solicitudes de Entrega</b> para tomar una.
+            </div>
+        </div>
+    </section>
+
+    <!-- ===================== DENUNCIAS ===================== -->
+    <section class="section" id="sec-denuncias">
+        <div class="section-head">
+            <div class="eyebrow">✦ Seguridad</div>
+            <h1>Centro de <em>Denuncias</em></h1>
+        </div>
+        <div class="card">
+            <div class="card-header">
+                <span class="card-title">Denuncias</span>
+                <div class="search-box"><span>🔍</span><input type="text" placeholder="Buscar denuncia..." oninput="filtrarTabla(this,'tbl-den')"></div>
+            </div>
+            <table id="tbl-den">
+                <thead>
+                <tr><th>#</th><th>Denunciante</th><th>Motivo</th><th>Estado</th><th>Acciones</th></tr>
+                </thead>
+                <tbody>
+                <tr th:each="d : ${denuncias}" th:attr="data-id=${d.idDenuncia}">
+                    <td th:text="'D-' + ${d.idDenuncia}"></td>
+                    <td th:text="'Usuario #' + ${d.idUsuarioDenunciante}"></td>
+                    <td th:text="${d.tipoDenuncia}"></td>
+                    <td>
+                        <span class="badge badge-pendiente" th:if="${d.estado.name() == 'pendiente'}">⏳ Pendiente</span>
+                        <span class="badge badge-revision" th:if="${d.estado.name() == 'en_revision'}">↻ En revisión</span>
+                        <span class="badge badge-resuelta" th:if="${d.estado.name() == 'resuelta'}">✓ Resuelta</span>
+                        <span class="badge badge-cancelado" th:if="${d.estado.name() == 'rechazada'}">✗ Rechazada</span>
+                    </td>
+                    <td class="actions">
+                        <button class="btn-sm abrir-denuncia" title="Ver / responder"
+                                th:attr="data-id=${d.idDenuncia}"
+                                th:data-desc="${d.descripcion}"
+                                th:data-tipo="${d.tipoDenuncia}">📋</button>
+                        <button class="btn-sm" title="Resolver" th:if="${d.estado.name() != 'resuelta'}" th:onclick="'resolverDenuncia(' + ${d.idDenuncia} + ')'">✅</button>
+                    </td>
+                </tr>
+                <tr th:if="${#lists.isEmpty(denuncias)}"><td colspan="5">No hay denuncias registradas.</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+    <!-- ===================== GESTIÓN DE EMPLEADOS (CRUD) ===================== -->
+    <section class="section" id="sec-empleados">
+        <div class="section-head">
+            <div class="eyebrow">✦ Administración</div>
+            <h1>Gestión de <em>Empleados</em></h1>
+        </div>
+        <div class="card">
+            <div class="card-header">
+                <span class="card-title">Empleados registrados</span>
+                <button class="btn-primary" onclick="abrirNuevoEmpleado()">+ Nuevo empleado</button>
+            </div>
+            <table id="tbl-emp">
+                <thead>
+                <tr><th>Documento</th><th>Nombre completo</th><th>Correo</th><th>Acciones</th></tr>
+                </thead>
+                <tbody>
+                <tr th:each="e : ${empleados}" th:attr="data-id=${e.idEmpleado}">
+                    <td th:text="${e.idEmpleado}"></td>
+                    <td th:text="${e.persona.nombreCompleto}"></td>
+                    <td th:text="${e.correo}"></td>
+                    <td class="actions">
+                        <button class="btn-sm editar-empleado" title="Editar"
+                                th:attr="data-id=${e.idEmpleado}"
+                                th:data-pnombre="${e.persona.primerNombre}"
+                                th:data-snombre="${e.persona.segundoNombre}"
+                                th:data-papellido="${e.persona.primerApellido}"
+                                th:data-sapellido="${e.persona.segundoApellido}"
+                                th:data-correo="${e.correo}">✏️</button>
+                        <button class="btn-sm danger" title="Eliminar" th:onclick="'eliminarEmpleado(' + ${e.idEmpleado} + ')'">🗑️</button>
+                    </td>
+                </tr>
+                <tr th:if="${#lists.isEmpty(empleados)}"><td colspan="4">No hay empleados registrados.</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+    <!-- ===================== ERRORES FRECUENTES ===================== -->
+    <section class="section" id="sec-errores">
+        <div class="section-head">
+            <div class="eyebrow">✦ Soporte</div>
+            <h1>Errores <em>Frecuentes</em></h1>
+        </div>
+        <div style="display:grid;gap:14px;">
+            <div class="card">
+                <div class="card-header" style="cursor:pointer;" onclick="toggleError(this)">
+                    <div><span style="color:var(--red);font-size:18px;margin-right:10px;">⚠️</span><span class="card-title">El intercambio no aparece en mi panel</span></div>
+                    <span class="err-arrow" style="color:var(--muted);font-size:18px;">▼</span>
+                </div>
+                <div class="err-body" style="padding:20px 22px;display:none;color:var(--muted);font-size:14px;line-height:1.7;border-top:1px solid var(--border);">
+                    Verifica que el administrador haya asignado el intercambio a tu usuario. Si el problema persiste, recarga la página y revisa que tu sesión esté activa.
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-header" style="cursor:pointer;" onclick="toggleError(this)">
+                    <div><span style="color:var(--yellow);font-size:18px;margin-right:10px;">⚠️</span><span class="card-title">No puedo marcar una entrega como completada</span></div>
+                    <span class="err-arrow" style="color:var(--muted);font-size:18px;">▼</span>
+                </div>
+                <div class="err-body" style="padding:20px 22px;display:none;color:var(--muted);font-size:14px;line-height:1.7;border-top:1px solid var(--border);">
+                    Para marcar una entrega como completada primero debe estar "En ruta". El sistema exige que confirmes la recogida antes de poder confirmar la entrega final.
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-header" style="cursor:pointer;" onclick="toggleError(this)">
+                    <div><span style="color:var(--blue);font-size:18px;margin-right:10px;">⚠️</span><span class="card-title">Usuario no está en casa al momento de la entrega</span></div>
+                    <span class="err-arrow" style="color:var(--muted);font-size:18px;">▼</span>
+                </div>
+                <div class="err-body" style="padding:20px 22px;display:none;color:var(--muted);font-size:14px;line-height:1.7;border-top:1px solid var(--border);">
+                    Usa el botón "Cliente no está (reagendar)" en Mis Entregas. Tras 3 intentos fallidos la entrega se marca automáticamente como Fallida.
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===================== PERFIL ===================== -->
+    <section class="section" id="sec-perfil">
+        <div class="section-head">
+            <div class="eyebrow">✦ Mi cuenta</div>
+            <h1>Mi <em>Perfil</em></h1>
+        </div>
+        <div class="profile-hero">
+            <div class="profile-avatar-big" th:text="${#strings.substring(empleado.persona.primerNombre,0,1)} + ${#strings.substring(empleado.persona.primerApellido,0,1)}">JD</div>
+            <div class="profile-info">
+                <h2 th:text="${empleado.persona.nombreCompleto}">Juan David López</h2>
+                <p th:text="${empleado.correo}">correo@swapy.com</p>
+                <div class="profile-tags">
+                    <span class="ptag">🚚 Empleado</span>
+                    <span class="ptag">✓ Verificado</span>
+                </div>
+            </div>
+        </div>
+        <div class="card">
+            <div class="card-header"><span class="card-title">Información personal</span></div>
+            <div style="padding:24px;">
+                <div class="profile-grid">
+                    <div class="profile-field"><label class="field-label">Nombre completo</label><input class="field-input" id="p-nombre" type="text" th:value="${empleado.persona.nombreCompleto}"></div>
+                    <div class="profile-field"><label class="field-label">Correo electrónico</label><input class="field-input" id="p-correo" type="email" th:value="${empleado.correo}"></div>
+                    <div class="profile-field"><label class="field-label">Teléfono</label><input class="field-input" id="p-telefono" type="tel" th:value="${perfil.telefono}"></div>
+                    <div class="profile-field"><label class="field-label">Ciudad</label><input class="field-input" id="p-ciudad" type="text" th:value="${perfil.ciudad}"></div>
+                    <div class="profile-field"><label class="field-label">Medio de transporte</label><input class="field-input" id="p-transporte" type="text" th:value="${perfil.medioTransporte}"></div>
+                </div>
+                <div style="margin-top:20px;">
+                    <button class="btn-primary" onclick="guardarPerfil()">💾 Guardar cambios</button>
+                </div>
+            </div>
+        </div>
+        <div class="card" style="margin-top:20px;">
+            <div class="card-header"><span class="card-title">Cambiar contraseña</span></div>
+            <div style="padding:24px;">
+                <div class="profile-grid">
+                    <div class="profile-field"><label class="field-label">Contraseña actual</label><input class="field-input" id="pw-actual" type="password" placeholder="••••••••"></div>
+                    <div class="profile-field"><label class="field-label">Nueva contraseña</label><input class="field-input" id="pw-nueva" type="password" placeholder="Mínimo 8 caracteres"></div>
+                </div>
+                <div style="margin-top:20px;">
+                    <button class="btn-primary" onclick="cambiarContrasena()">🔒 Actualizar contraseña</button>
+                </div>
+            </div>
+        </div>
+    </section>
+</main>
+
+<div class="modal-bg" id="modal-entrega">
+    <div class="modal-box">
+        <button class="modal-close" onclick="closeModal('modal-entrega')">✕</button>
+        <h3 id="entrega-modal-titulo">Nueva Solicitud</h3>
+        <p class="sub">Registra los datos de la entrega.</p>
+        <input type="hidden" id="entrega-id">
+        <div class="form-group">
+            <label>Intercambio relacionado</label>
+            <select id="entrega-intercambio">
+                <option th:each="i : ${intercambios}" th:value="${i.idIntercambio}"
+                        th:text="'#' + ${i.idIntercambio} + ' — ' + ${i.nProductoPublicado} + ' / ' + ${i.nProductoOfertado}"></option>
+            </select>
+        </div>
+        <div class="form-group"><label>Solicitante</label><input type="text" id="entrega-solicitante" placeholder="Nombre del usuario"></div>
+        <div class="form-group"><label>Dirección de recogida</label><input type="text" id="entrega-recogida" placeholder="Ej: Calle 80 #12-34"></div>
+        <div class="form-group"><label>Dirección de entrega</label><input type="text" id="entrega-entrega" placeholder="Ej: Carrera 15 #22-10"></div>
+        <div class="form-group"><label>Hora límite</label><input type="time" id="entrega-hora"></div>
+        <button class="btn-primary" style="width:100%;margin-top:6px;" onclick="guardarEntrega()">💾 Guardar solicitud</button>
+    </div>
+</div>
+
+<div class="modal-bg" id="modal-empleado">
+    <div class="modal-box">
+        <button class="modal-close" onclick="closeModal('modal-empleado')">✕</button>
+        <h3 id="empleado-modal-titulo">Nuevo Empleado</h3>
+        <p class="sub">Datos de acceso al panel.</p>
+        <input type="hidden" id="empleado-id">
+        <div class="form-group" id="empleado-doc-group">
+            <label>Tipo de documento</label>
+            <select id="empleado-tipo-doc">
+                <option th:each="t : ${tiposDocumento}" th:value="${t.idDoc}" th:text="${t.tipoDoc}"></option>
+            </select>
+        </div>
+        <div class="form-group" id="empleado-numdoc-group">
+            <label>Número de documento</label>
+            <input type="number" id="empleado-numdoc" placeholder="Ej: 1020304050">
+        </div>
+        <div class="form-group"><label>Primer nombre</label><input type="text" id="empleado-pnombre"></div>
+        <div class="form-group"><label>Segundo nombre (opcional)</label><input type="text" id="empleado-snombre"></div>
+        <div class="form-group"><label>Primer apellido</label><input type="text" id="empleado-papellido"></div>
+        <div class="form-group"><label>Segundo apellido (opcional)</label><input type="text" id="empleado-sapellido"></div>
+        <div class="form-group"><label>Correo</label><input type="email" id="empleado-correo"></div>
+        <div class="form-group" id="empleado-pass-group">
+            <label>Contraseña</label>
+            <input type="password" id="empleado-contrasena" placeholder="Mínimo 8 caracteres">
+        </div>
+        <button class="btn-primary" style="width:100%;margin-top:6px;" onclick="guardarEmpleado()">💾 Guardar empleado</button>
+    </div>
+</div>
+
+<div class="modal-bg" id="modal-denuncia">
+    <div class="modal-box">
+        <button class="modal-close" onclick="closeModal('modal-denuncia')">✕</button>
+        <h3>Detalle de Denuncia</h3>
+        <p class="sub" id="denuncia-titulo">—</p>
+        <div class="form-group"><label>Descripción</label><textarea id="denuncia-desc" readonly style="opacity:.75;"></textarea></div>
+        <div class="form-group"><label>Respuesta del empleado</label><textarea id="denuncia-respuesta" placeholder="Escribe tu observación o solución..."></textarea></div>
+        <div style="display:flex;gap:10px;">
+            <button class="btn-primary" style="flex:1;" onclick="enviarRespuestaDenuncia()">📨 Enviar respuesta</button>
+            <button class="btn-outline" style="flex:1;" onclick="resolverDenunciaDesdeModal()">✅ Resolver</button>
+        </div>
+    </div>
+</div>
+
+<div id="toast" style="
+    position:fixed;bottom:28px;right:28px;
+    background:var(--brown-card);
+    border:1px solid var(--orange);
+    color:var(--text);
+    padding:12px 20px;
+    border-radius:var(--radius-md);
+    font-size:14px;
+    font-weight:500;
+    z-index:9999;
+    transform:translateY(80px);
+    opacity:0;
+    transition:all .3s ease;
+    pointer-events:none;
+    box-shadow:0 8px 24px rgba(0,0,0,0.4);"></div>
+
+<script th:src="@{/assets/script/empleado_panel.js}"></script>
+</body>
+</html>
