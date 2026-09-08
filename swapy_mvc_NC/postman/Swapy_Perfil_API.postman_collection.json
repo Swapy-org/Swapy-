@@ -1,0 +1,121 @@
+{
+  "info": {
+    "name": "Swapy - Perfil API",
+    "description": "Coleccion para probar el perfil de usuario desde Postman con la base swapy actual.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost/swapy_mvc_NC/public/index.php"
+    },
+    {
+      "key": "usuarioId",
+      "value": "1"
+    }
+  ],
+  "item": [
+    {
+      "name": "Ver perfil por ID",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Accept",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/perfil/{{usuarioId}}",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "perfil",
+            "{{usuarioId}}"
+          ]
+        }
+      }
+    },
+    {
+      "name": "Actualizar perfil con JSON",
+      "request": {
+        "method": "PUT",
+        "header": [
+          {
+            "key": "Accept",
+            "value": "application/json"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"nombre\": \"usuario_postman\",\n  \"descripcion\": \"Me interesan cambios de tecnologia y hogar.\",\n  \"categorias\": [\"Tecnologia\", \"Hogar\"]\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/perfil/{{usuarioId}}",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "perfil",
+            "{{usuarioId}}"
+          ]
+        }
+      }
+    },
+    {
+      "name": "Actualizar perfil con form-data",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Accept",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "formdata",
+          "formdata": [
+            {
+              "key": "username",
+              "value": "usuario_formdata",
+              "type": "text"
+            },
+            {
+              "key": "telefono",
+              "value": "3210000000",
+              "type": "text"
+            },
+            {
+              "key": "descripcion",
+              "value": "Perfil actualizado desde form-data.",
+              "type": "text"
+            },
+            {
+              "key": "categorias",
+              "value": "Moda, Deportes",
+              "type": "text"
+            }
+          ]
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/perfil/{{usuarioId}}",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "perfil",
+            "{{usuarioId}}"
+          ]
+        }
+      }
+    }
+  ]
+}
