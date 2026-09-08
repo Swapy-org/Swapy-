@@ -1,0 +1,32 @@
+.azul {
+    background: linear-gradient(to bottom,#0b7af1);
+    color: white;
+    height: 80px;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    padding-right: 15px;
+    font-family: sans-serif;
+    flex-grow: 1;
+}
+
+.rojo {
+    background: linear-gradient(to bottom, #e42210);
+    height: 25px;
+    flex-grow: 1;
+    border: solid;
+}
+
+.morado {
+    background: linear-gradient(to bottom, #7422d1);
+    height: 300px;
+    flex-grow: 1;
+    border: solid;
+}
+
+.naranja {
+    background: linear-gradient(to bottom, #f0a00b);
+    height: 60px;
+    flex-grow: 1;
+    border: solid;
+    }
